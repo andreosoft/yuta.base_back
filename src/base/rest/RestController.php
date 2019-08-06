@@ -12,7 +12,7 @@ class RestController extends \base\core\Controller {
     }
     
     public function getFilters($fs) {
-        return '';
+        return null;
     }
 
     public function action_get() {
@@ -76,7 +76,7 @@ class RestController extends \base\core\Controller {
         $fs = json_decode(filter_input(INPUT_GET, 'filters'));
         $f_str = '';
         $f_arr = $this->getFilters($fs);
-        if (count($f_arr) > 0) {
+        if (is_array($f_arr) && count($f_arr) > 0) {
             $f_str = " WHERE ".implode(' AND ', $f_arr);
         }
         $table_name = (new $this->baseModel)->table_name();

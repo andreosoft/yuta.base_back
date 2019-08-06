@@ -1,30 +1,35 @@
 <?php
 
-namespace modules\users\controllers;
+namespace modules\content\controllers;
 
-class Api extends \base\rest\RestController {
+class Index extends \base\rest\RestParentController {
 
-    public $baseModel = 'modules\users\models\User';
+    public $baseModel = '\modules\content\models\Content';
 
     public function preAction($action) {
         $this->corsHeaders();
-        if (\A::$app->user()->role < 100) {
-            header('HTTP/1.0 403 Forbidden');
-            echo 'You are forbidden!';
-            exit();
+        if ($action == 'get') {
+            if (\A::$app->user()->role < 1) {
+                header('HTTP/1.0 403 Forbidden');
+                echo 'You are forbidden!';
+                exit();
+            }
+        } else {
+            if (\A::$app->user()->role < 100) {
+                header('HTTP/1.0 403 Forbidden');
+                echo 'You are forbidden!';
+                exit();
+            }
         }
     }
 
     public function getFilters($fs) {
         $f_ar = [];
-        if (count($fs) > 0) {
+        if (is_object($fs)) {
             foreach ($fs as $key => $val) {
                 if ($val === "")
                     continue;
                 switch ($key) {
-                    case 'login':
-                        $f_ar[] = "`$key` LIKE '%$val%'";
-                        break;
                     case 'id':
                         $f_ar[] = "`$key` = '$val'";
                         break;
@@ -34,16 +39,13 @@ class Api extends \base\rest\RestController {
                     case 'status':
                         $f_ar[] = "`$key` = '$val'";
                         break;
-                    case 'role':
+                    case 'parent_id':
                         $f_ar[] = "`$key` = '$val'";
                         break;
                 }
             }
         }
-        if (count($f_ar) > 0) {
-            return " WHERE " . implode(' AND ', $f_ar);
-        }
-        return;
+        return $f_ar;
     }
 
 }

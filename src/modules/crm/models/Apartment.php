@@ -42,7 +42,7 @@ class Apartment extends \modules\activity\models\Model {
 
     public function save($info = '') {
         if ($this->id == null) {
-            $this->createdby_id = \A::$app->user()->id;
+            $this->user_id = \A::$app->user()->id;
             $this->createdon = date('Y-m-d H:i:s', time());
         }
         return parent::save($info = '');
