@@ -21,8 +21,7 @@ class Building extends \modules\activity\models\Model {
             `object_id` INT,
             `user_id` INT, 
             `createdon` DATETIME,
-            `name` varchar(255),
-            
+            `name` varchar(255)
             );";
 
     public static function table_name() {
