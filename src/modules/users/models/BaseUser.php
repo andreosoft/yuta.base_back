@@ -2,7 +2,7 @@
 
 namespace modules\users\models;
 
-class BaseUser extends \base\core\Model {
+class BaseUser extends \modules\activity\models\Model {
 
     public static $create_q = " 
             DROP TABLE IF EXISTS `users`;

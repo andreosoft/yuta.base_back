@@ -2,7 +2,7 @@
 
 namespace modules\content\models;
 
-class Content extends \base\core\Model {
+class Content extends \modules\activity\models\Model {
 
     public $_user, $_parent;
 
