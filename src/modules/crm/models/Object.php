@@ -38,13 +38,12 @@ class Object extends \modules\activity\models\Model {
         return true;
     }
 
-    public function save() {
-        if ($this->id === null) {
-            $this->user_id = \A::$app->user()->id;
+    public function save($info = '') {
+        if ($this->id == null) {
+            $this->createdby_id = \A::$app->user()->id;
             $this->createdon = date('Y-m-d H:i:s', time());
         }
-        parent::save();
-        return true;
+        return parent::save($info = '');
     }
     
     public function get_user() {
