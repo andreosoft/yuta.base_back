@@ -21,7 +21,7 @@ class Model extends \base\core\Model {
         $model = $this->gen_model($info);
         $model->action = 'delete';
         $model->table_id = $this->id;
-        $res = parent::save();
+        $res = parent::delete();
         $model->save();
         return $res;
     }

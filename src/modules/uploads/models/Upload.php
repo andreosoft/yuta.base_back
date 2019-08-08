@@ -1,8 +1,8 @@
 <?php
 
-namespace modules\content\models;
+namespace modules\uploads\models;
 
-class Uploads extends \modules\activity\models\Model {
+class Upload extends \modules\activity\models\Model {
 
     public $_user;
 

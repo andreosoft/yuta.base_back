@@ -4,7 +4,7 @@ namespace modules\crm\models;
 
 class Object extends \modules\activity\models\Model {
 
-    public $_user;
+    public $_user, $_buildings;
 
     public $fields = [
         'id' => null,
@@ -46,10 +46,24 @@ class Object extends \modules\activity\models\Model {
         return parent::save($info = '');
     }
     
+    public function delete($info = '') {
+        foreach ($this->buildings as $building) {
+            $building->delete($info = '');
+        }
+        return parent::delete($info = '');
+    }
+
     public function get_user() {
         if (!is_object($this->_user)) {
             $this->_user = User::findOne(['id' => $this->user_id]);
         }
         return $this->_user;
+    }
+
+    public function get_buildings() {
+        if (!is_object($this->_buildings)) {
+            $this->_buildings = Building::findMany(['object_id' => $this->id]);
+        }
+        return $this->_buildings;
     }
 }
