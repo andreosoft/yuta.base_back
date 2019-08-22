@@ -14,4 +14,27 @@ class Contact extends \base\rest\RestController {
             exit();
         }       
     }
+
+    public function getFilters($fs) {
+        $f_ar = [];
+        if (is_object($fs)) {
+            foreach ($fs as $key => $val) {
+                if ($val === "")
+                    continue;
+                switch ($key) {
+                    case 'id':
+                        $f_ar[] = "`$key` = '$val'";
+                        break;
+                    case 'name':
+                        $f_ar[] = "`$key` LIKE '%$val%'";
+                        break;
+                    case 'address':
+                        $f_ar[] = "`$key` LIKE '%$val%'";
+                        break;
+
+                }
+            }
+        }
+        return $f_ar;
+    }
 }

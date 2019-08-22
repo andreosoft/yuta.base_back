@@ -15,7 +15,11 @@ class Apartment extends \modules\activity\models\Model {
         'price' => null,
         'user_id' => null,
         'createdon' => null,
-        'info' => null
+        'info' => null,
+        'type_id' => null,
+        'square' => null,
+        'status' => null,
+        'is_studio' => null
     ];
     
     public static $create_q = " 
@@ -23,10 +27,14 @@ class Apartment extends \modules\activity\models\Model {
             CREATE TABLE crm_apartments (
             `id` INT not null primary key AUTO_INCREMENT, 
             `floor_id` INT,
+            `type_id` INT,
             `plan_id` INT,
             `number` varchar(255),
             `rooms` INT,
             `price` decimal(12,2),
+            `square` decimal(12,3),
+            `status` INT,
+            `is_studio` INT(1),
             `user_id` INT, 
             `createdon` DATETIME,
             `info` TEXT

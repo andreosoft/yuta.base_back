@@ -4,7 +4,7 @@ namespace modules\crm\models;
 
 class Contact extends \modules\activity\models\Model {
 
-    public $_user;
+    public $_user, $_deals;
 
     public $fields = [
         'id' => null,
@@ -41,11 +41,33 @@ class Contact extends \modules\activity\models\Model {
         }
         return parent::save($info = '');
     }
+
+    public function delete($info = '') {
+        foreach ($this->apartments as $apartment) {
+            $apartment->delete($info = '');
+        }
+        return parent::delete($info = '');
+    }
+
+    public function get_deals() {
+        if (!is_object($this->_deals)) {
+            $this->_deals = Deal::findMany(['contact_id' => $this->id]);
+        }
+        return $this->_deals;
+    }
     
     public function get_user() {
         if (!is_object($this->_user)) {
             $this->_user = User::findOne(['id' => $this->user_id]);
         }
         return $this->_user;
+    }
+
+    public function get_fields_one() {
+        $res = $this->fields;
+        foreach ($this->deals as $deal) {
+            $res['deals'][] = $deal->fields;
+        }
+        return $res;
     }
 }

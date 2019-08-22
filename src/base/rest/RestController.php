@@ -6,7 +6,11 @@ class RestController extends \base\core\Controller {
 
     public $baseModel = '';
     public $sortDefault = 'id ASC';
-    
+    public $pager = [
+        'page' => 0,
+        'limit' => 150
+    ];
+
     public function preAction($action) {
         $this->corsHeaders();
     }
@@ -68,24 +72,37 @@ class RestController extends \base\core\Controller {
 
     public function get_all() {
         $sort = json_decode(filter_input(INPUT_GET, 'sort'));
-        if (is_object($sort)) {
+        $pgr = json_decode(filter_input(INPUT_GET, 'pager'));
+        $fs = json_decode(filter_input(INPUT_GET, 'filters'));
+        if (is_object($sort) && isset($sort->key)  && isset($sort->order) && $sort->key != '' && $sort->order != '') {
             $sort = "{$sort->key} {$sort->order}";
         } else {
             $sort = $this->sortDefault;
         }
-        $fs = json_decode(filter_input(INPUT_GET, 'filters'));
+
+        $pager = $this->pager;
+        if (is_object($pgr)) {
+            $pager['limit'] = $pgr->limit;
+            $pager['page'] = $pgr->page;
+        }
+        $pager['offset'] = $pager['page'] * $pager['limit'];
+        
         $f_str = '';
         $f_arr = $this->getFilters($fs);
         if (is_array($f_arr) && count($f_arr) > 0) {
             $f_str = " WHERE ".implode(' AND ', $f_arr);
         }
         $table_name = (new $this->baseModel)->table_name();
-        $els = (new $this->baseModel)->findManyByQuery("SELECT $table_name.* FROM $table_name $f_str ORDER BY $sort");
+        $q_body = "FROM $table_name $f_str";
+        $q = "SELECT COUNT(*) $q_body";
+        $pager['count'] = \A::$app->db()->query($q)->fetchAll(\PDO::FETCH_ASSOC)[0]['COUNT(*)'];
+        $q = "SELECT $table_name.* $q_body ORDER BY $sort LIMIT {$pager['limit']} OFFSET {$pager['offset']}";
+        $els = (new $this->baseModel)->findManyByQuery($q);
         $res = [];
         foreach ($els as $el) {
             $res[] = $el->fields_many;
         }
-        return json_encode(['status' => 'ok', 'data' => $res]);
+        return json_encode(['status' => 'ok', 'data' => $res, 'pager' => $pager]);
     }
 
 }

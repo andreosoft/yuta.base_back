@@ -4,7 +4,7 @@ namespace modules\crm\models;
 
 class Floor extends \modules\activity\models\Model {
 
-    public $_user, $_section;
+    public $_user, $_section, $_apartments;
 
     public $fields = [
         'id' => null,
@@ -41,6 +41,20 @@ class Floor extends \modules\activity\models\Model {
         }
         return parent::save($info = '');
     }
+
+    public function delete($info = '') {
+        foreach ($this->apartments as $apartment) {
+            $apartment->delete($info = '');
+        }
+        return parent::delete($info = '');
+    }
+
+    public function get_apartments() {
+        if (!is_object($this->_apartments)) {
+            $this->_apartments = Apartment::findMany(['floor_id' => $this->id]);
+        }
+        return $this->_apartments;
+    }
     
     public function get_user() {
         if (!is_object($this->_user)) {
@@ -55,4 +69,5 @@ class Floor extends \modules\activity\models\Model {
         }
         return $this->_section;
     }
+
 }

@@ -14,4 +14,21 @@ class Floor extends \base\rest\RestController {
             exit();
         }       
     }
+
+    public function get_all() {
+        $parent = filter_input(INPUT_GET, 'parent_id');
+        $sort = json_decode(filter_input(INPUT_GET, 'sort'));
+        if (is_object($sort)) {
+            $sort = "{$sort->key} {$sort->order}";
+        } else {
+            $sort = $this->sortDefault;
+        }
+        $table_name = (new $this->baseModel)->table_name();
+        $els = (new $this->baseModel)->findManyByQuery("SELECT $table_name.* FROM $table_name WHERE `section_id` = '$parent' ORDER BY $sort");
+        $res = [];
+        foreach ($els as $el) {
+            $res[] = $el->fields_many;
+        }
+        return json_encode(['status' => 'ok', 'data' => $res]);
+    }
 }
