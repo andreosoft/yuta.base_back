@@ -1,35 +1,43 @@
 <?php
 
-namespace modules\crm\models;
+namespace modules\content\models;
 
-class Contact extends \modules\db\models\Model {
+class Uploads extends \modules\activity\models\Model {
 
-    public $_user, $_deals;
+    public $_user;
 
     public $fields = [
         'id' => null,
         'user_id' => null,
         'createdon' => null,
         'name' => null,
-        'phone' => null,
+        'file' => null,
+        'info' => null,
         'status' => null,
-        'manager_id' => null
+        'type_id' => null,
+        'group_id' => null,
+        'table_name' => null,
+        'table_row_id' => null
     ];
     
     public static $create_q = " 
-            DROP TABLE IF EXISTS crm_contacts;
-            CREATE TABLE crm_contacts (
+            DROP TABLE IF EXISTS uploads;
+            CREATE TABLE uploads (
             `id` INT not null primary key AUTO_INCREMENT, 
             `user_id` INT, 
             `createdon` DATETIME,
             `name` varchar(255), 
-            `address` TEXT,
+            `file` varchar(255),
+            `info` TEXT,
             `status` INT,
-            `manager_id` INT
+            `type_id` INT,
+            `group_id` INT,
+            `table_name` varchar(255),
+            `table_row_id` INT
             );";
 
     public static function table_name() {
-        return 'crm_contacts';
+        return 'uploads';
     }
 
     public function validate() {
@@ -43,33 +51,11 @@ class Contact extends \modules\db\models\Model {
         }
         return parent::save($info = '');
     }
-
-    public function delete($info = '') {
-        foreach ($this->apartments as $apartment) {
-            $apartment->delete($info = '');
-        }
-        return parent::delete($info = '');
-    }
-
-    public function get_deals() {
-        if (!is_object($this->_deals)) {
-            $this->_deals = Deal::findMany(['contact_id' => $this->id]);
-        }
-        return $this->_deals;
-    }
     
     public function get_user() {
         if (!is_object($this->_user)) {
             $this->_user = User::findOne(['id' => $this->user_id]);
         }
         return $this->_user;
-    }
-
-    public function get_fields_one() {
-        $res = $this->fields;
-//        foreach ($this->deals as $deal) {
-//            $res['deals'][] = $deal->fields;
-//        }
-        return $res;
     }
 }

@@ -7,10 +7,17 @@ use PDO;
 class Model {
 
     public $fields = [];
+    public $struct = [];
     public $validators = [];
     public $_errors;
     public $_isnew;
     private $data = [];
+
+    public function __construct() {
+        foreach ($this->struct as $key => $value) {
+            $this->fields[$key] = null;
+        }
+    }
 
     public function __get($name) {
         $m_name = 'get_' . $name;
@@ -58,7 +65,7 @@ class Model {
             }
         } else {
             if (is_array($array)) {
-                foreach ($array as $name => $value) {
+                foreach ($array as $name => $value) {      
                     $this->__set($name, $value);
                 }
                 return true;
@@ -70,9 +77,31 @@ class Model {
     public function validate() {
         return true;
     }
-    
+
+    public function transform_out_db($key, $value) {
+        if (array_key_exists($key, $this->struct) && is_array($this->struct[$key]) && array_key_exists('type', $this->struct[$key])) {
+            switch ($this->struct[$key]['type']) {
+                case 'json':
+                    return json_decode($value, true);
+            }
+        }
+        return $value;
+    }
+
+    public function transform_in_db($key, $value) {
+        if (array_key_exists($key, $this->struct) && is_array($this->struct[$key]) && array_key_exists('type', $this->struct[$key])) {
+            switch ($this->struct[$key]['type']) {
+                case 'json':
+                    return json_encode($value);
+            }
+        }
+        return $value;
+    }
+
     public function set($array) {
-        $this->fields = array_merge($this->fields, $array);
+        foreach ($array as $key => $value) {
+            $this->fields[$key] = $this->transform_out_db($key, $value);
+        }
         return true;
     }
 
@@ -95,7 +124,9 @@ class Model {
             $i = 0;
             $val_ins = [];
             foreach ($this->fields as $n => $v) {
-                if ($v === null) continue;
+                if ($v === null)
+                    continue;
+                $v = $this->transform_in_db($n, $v);
                 if ($i > 0) {
                     $str .= ', ';
                 }
@@ -108,7 +139,6 @@ class Model {
 //                print_r($q);die();
 //                print_r($this->fields);print_r($val_ins);die();
                 \A::$app->db()->prepare($q)->execute($val_ins);
-//                \A::$app->db()->exec($q);
             }
         } else {
             $this->_isnew = true;
@@ -117,7 +147,9 @@ class Model {
             $str_v = '';
             $val_ins = [];
             foreach ($this->fields as $n => $v) {
-                if ($v === null) continue;
+                $v = $this->transform_in_db($n, $v);
+                if ($v === null)
+                    continue;
                 if ($i > 0) {
                     $str_n .= ', ';
                     $str_v .= ', ';
@@ -126,17 +158,15 @@ class Model {
                 $str_n .= "`$n`";
                 $str_v .= "?";
                 $val_ins[] = $v;
-//                $str_v .= "'$v'";
             }
             if (!empty($str_n)) {
                 $q = "INSERT INTO `$t` ($str_n) VALUES ($str_v)";
 //                 print_r($this->fields);print_r($val_ins);die();
                 \A::$app->db()->prepare($q)->execute($val_ins);
-//                \A::$app->db()->exec($q);
             }
             $this->fields['id'] = \A::$app->db()->lastInsertId();
         }
-        
+
         return $this->fields['id'];
     }
 
@@ -146,17 +176,24 @@ class Model {
         \A::$app->db()->exec($q);
         return true;
     }
-    
+
+    public function delete_all() {
+        $t = static::table_name();
+        $q = "TRUNCATE TABLE `$t`";
+        \A::$app->db()->exec($q);
+        return true;
+    }
+
     public static function findOne($d) {
 
         $t = static::table_name();
         $q = (new Query())->select()->from($t)->where($d)->get();
-        $data = \A::$app->db()->query($q)->fetchAll(PDO::FETCH_ASSOC);
+        $data = \A::$app->db()->query($q)->fetchAll(\PDO::FETCH_ASSOC);
 
         $class = get_called_class();
         $m = new $class();
         if (isset($data[0])) {
-        $m->set($data[0]);
+            $m->set($data[0]);
             return $m;
         }
         return null;
@@ -167,7 +204,7 @@ class Model {
         $t = static::table_name();
         $q = (new Query())->select()->from($t)->where($w)->get();
 //        print_r ($q);
-        $data = \A::$app->db()->query($q)->fetchAll(PDO::FETCH_ASSOC);
+        $data = \A::$app->db()->query($q)->fetchAll(\PDO::FETCH_ASSOC);
 
         $class = get_called_class();
         $m = [];
@@ -203,7 +240,7 @@ class Model {
         }
         return $label;
     }
-    
+
     public function errors() {
         return $this->_errors;
     }
@@ -213,18 +250,19 @@ class Model {
             return $this->validators[$attr]['message'];
         }
     }
-    
-     public function getValidatorType($attr) {
+
+    public function getValidatorType($attr) {
         if (isset($this->validators[$attr]['type'])) {
             return $this->validators[$attr]['type'];
         }
     }
-    
+
     public function get_fields_many() {
         return $this->fields;
     }
-    
+               
     public function get_fields_one() {
         return $this->fields;
     }
+
 }

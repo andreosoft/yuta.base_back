@@ -6,9 +6,9 @@ class UserLogin extends BaseUser {
      
     public $_password;
 
-    public function set_phone($d) {
-        $this->login = preg_replace('/[^0-9,]/', '', $d);
-    }
+//    public function set_phone($d) {
+//        $this->login = preg_replace('/[^0-9,]/', '', $d);
+//    }
     
     public function set_password($d) {
         if ($d != '') {
@@ -36,7 +36,7 @@ class UserLogin extends BaseUser {
     }
     
     public function genToken() {
-        $token = md5(time() * $this->id);
+        $token = md5(time() * $this->id).time().md5($this->id);
         $this->token = $token;
     }
 

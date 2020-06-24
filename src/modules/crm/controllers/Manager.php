@@ -31,11 +31,14 @@ class Manager extends \base\core\Controller  {
         if (is_object($sort) && isset($sort->key) && $sort->key != '' && isset($sort->order) && $sort->order != '') {
             $sort = "{$sort->key} {$sort->order}";
         } else {
-            $sort = 'apartment ASC';
+            $sort = 'apartment_int ASC';
         }
 
         $q = "
         SELECT 
+            crm_apartments.*,
+            crm_apartments.id AS apartment_id,
+            CAST(crm_apartments.number AS UNSIGNED) AS apartment_int,
             crm_apartments.number AS apartment,
             crm_apartments.price AS price,
             crm_apartments.square AS square,

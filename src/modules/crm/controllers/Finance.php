@@ -2,11 +2,10 @@
 
 namespace modules\crm\controllers;
 
-use modules\crm\models\DealSelect;
 
-class Deal extends \base\rest\RestController {
+class Finance extends \base\rest\RestController {
 
-    public $baseModel = '\modules\crm\models\Deal';
+    public $baseModel = '\modules\crm\models\Finance';
 
     public function preAction($action) {
         parent::preAction($action);
@@ -17,7 +16,7 @@ class Deal extends \base\rest\RestController {
         }
     }
 
-    public function get_all() {
+public function get_all() {
         $sort = json_decode(filter_input(INPUT_GET, 'sort'));
         $pgr = json_decode(filter_input(INPUT_GET, 'pager'));
         $fs = json_decode(filter_input(INPUT_GET, 'filters'));
@@ -42,13 +41,15 @@ class Deal extends \base\rest\RestController {
         $table_name = (new $this->baseModel)->table_name();
         $q_body = "FROM $table_name 
         LEFT JOIN `crm_contacts` ON crm_contacts.id = $table_name.contact_id
-        LEFT JOIN `crm_apartments` ON crm_apartments.id = $table_name.apartment_id $f_str";
+        LEFT JOIN `crm_deals` ON crm_deals.id = $table_name.deal_id
+        LEFT JOIN `users` ON users.id = $table_name.manager_id $f_str";
         $q = "SELECT COUNT(*) $q_body";
         $pager['count'] = \A::$app->db()->query($q)->fetchAll(\PDO::FETCH_ASSOC)[0]['COUNT(*)'];
         $q = "SELECT 
         $table_name.* , 
         crm_contacts.name AS contact,
-        crm_apartments.number AS apartment 
+        crm_deals.name AS deal,
+        users.name AS manager 
         $q_body ORDER BY $sort LIMIT {$pager['limit']} OFFSET {$pager['offset']}";
         $data = \A::$app->db()->query($q)->fetchAll(\PDO::FETCH_ASSOC);
         return json_encode(['status' => 'ok', 'data' => $data, 'pager' => $pager]);
@@ -73,12 +74,8 @@ class Deal extends \base\rest\RestController {
                 if ($key == 'contact') {
                     $f_ar[] = "crm_contacts.name LIKE '%$val%'";
                 }
-                if ($key == 'apartment') {
-                    $f_ar[] = "crm_apartments.number LIKE '%$val%'";
-                }
             }
         }
         return $f_ar;
     }
-
 }

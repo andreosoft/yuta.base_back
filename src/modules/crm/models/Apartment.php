@@ -2,7 +2,7 @@
 
 namespace modules\crm\models;
 
-class Apartment extends \modules\activity\models\Model {
+class Apartment extends \modules\db\models\Model {
 
     public $_user, $_floor, $_plan;
 

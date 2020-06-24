@@ -1,16 +1,16 @@
 <?php
 
 return [
-    'name' => 'crmav100',
+    'name' => 'yuta.base',
     'db_mysql' => [
         'host' => 'localhost',
-        'db' => 'crmav100_test',
-        'user' => 'crmav100_base',
-        'password' => 'xxxxxxx'], 
+        'db' => 'xxxx',
+        'user' => 'xxxx',
+        'password' => 'xxxxxx'], 
     'mail' => [
         'host' => 'smtp.yandex.ru',
         'username' => 'robot@pxdesign.ru',
-        'password' => 'xxxxxxxx',
+        'password' => 'zpoef3i8dhaksjw23',
         'from' => ['robot@pxdesign.ru', 'no-replay'],
         'SMTPSecure' => 'ssl',
         'port' => 465

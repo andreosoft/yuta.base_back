@@ -8,7 +8,7 @@ class RestController extends \base\core\Controller {
     public $sortDefault = 'id ASC';
     public $pager = [
         'page' => 0,
-        'limit' => 150
+        'limit' => 1000
     ];
 
     public function preAction($action) {

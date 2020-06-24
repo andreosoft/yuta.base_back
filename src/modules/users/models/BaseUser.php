@@ -21,7 +21,11 @@ class BaseUser extends \modules\activity\models\Model {
             phone VARCHAR(255),
             firm VARCHAR(255), 
             image VARCHAR(255), 
-            address text);";
+            sip_number VARCHAR(255),
+            sip_password VARCHAR(255),
+            `api_key` VARCHAR(255),
+            address text);
+            ALTER TABLE `users` ADD INDEX (`api_key`);";
     
     public $fields = [
         'id' => null,
@@ -38,7 +42,10 @@ class BaseUser extends \modules\activity\models\Model {
         'phone' => null,
         'firm' => null,
         'image' => null,
-        'address' => null
+        'address' => null,
+        'api_key' => null,
+        'sip_number' => null,
+        'sip_password' => null
     ];
 
     public static function table_name() {
@@ -57,7 +64,10 @@ class BaseUser extends \modules\activity\models\Model {
             'surname' => $this->surname,
             'phone' => $this->phone,
             'role' => $this->role,
-            'status' => $this->status
+            'status' => $this->status,
+            'api_key' => $this->api_key,
+            'sip_number' => $this->sip_number,
+            'sip_password' => $this->sip_password
         ];
     }
 
